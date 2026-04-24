@@ -19,14 +19,17 @@ export function EnrollmentPage() {
   const {
     methods,
     currentStep,
+    isEditingCourse,
     handleNextStep,
     handlePrevStep,
     goToStep,
+    startCourseEdit,
     handleEnrollmentTypeChange,
     pendingSwitch,
     confirmSwitch,
     cancelSwitch,
     handleSubmit,
+    handleReset,
     isPending,
     submissionError,
     enrollmentResult,
@@ -42,6 +45,7 @@ export function EnrollmentPage() {
             <Step1CourseSelect
               onEnrollmentTypeChange={handleEnrollmentTypeChange}
               onNext={handleNextStep}
+              isEditingCourse={isEditingCourse}
             />
           )}
           {currentStep === 2 && (
@@ -51,6 +55,8 @@ export function EnrollmentPage() {
             <Step3Confirm
               onPrev={handlePrevStep}
               onSubmit={handleSubmit}
+              goToStep={goToStep}
+              onEditCourse={startCourseEdit}
               isPending={isPending}
               submissionError={submissionError}
             />
@@ -75,7 +81,9 @@ export function EnrollmentPage() {
         </Dialog>
       </div>
 
-      {enrollmentResult && <SuccessScreen result={enrollmentResult} />}
+      {enrollmentResult && (
+        <SuccessScreen result={enrollmentResult} onReset={handleReset} />
+      )}
     </FormProvider>
   );
 }
