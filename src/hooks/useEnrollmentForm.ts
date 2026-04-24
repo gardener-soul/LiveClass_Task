@@ -52,6 +52,7 @@ function buildEnrollmentRequest(data: EnrollmentFormValues): EnrollmentRequest {
 
 export function useEnrollmentForm() {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [isEditingCourse, setIsEditingCourse] = useState(false);
   const [pendingSwitch, setPendingSwitch] = useState(false);
   const [submissionError, setSubmissionError] = useState<ErrorResponse | null>(null);
   const [enrollmentResult, setEnrollmentResult] = useState<EnrollmentResponse | null>(null);
@@ -90,7 +91,12 @@ export function useEnrollmentForm() {
       return;
     }
 
-    setCurrentStep((prev) => (prev + 1) as 1 | 2 | 3);
+    if (currentStep === 1 && isEditingCourse) {
+      setIsEditingCourse(false);
+      setCurrentStep(3);
+    } else {
+      setCurrentStep((prev) => (prev + 1) as 1 | 2 | 3);
+    }
   };
 
   const handlePrevStep = () => {
@@ -99,6 +105,12 @@ export function useEnrollmentForm() {
 
   const goToStep = (step: 1 | 2 | 3) => {
     if (step < currentStep) setCurrentStep(step);
+  };
+
+  // Step 3에서 강의 정보만 수정할 때: Step 2를 건너뛰고 Step 1 → Step 3으로 이동
+  const startCourseEdit = () => {
+    setIsEditingCourse(true);
+    setCurrentStep(1);
   };
 
   const hasGroupData = (): boolean => {
@@ -145,17 +157,27 @@ export function useEnrollmentForm() {
     mutation.mutate(buildEnrollmentRequest(data));
   });
 
+  const handleReset = () => {
+    methods.reset();
+    setCurrentStep(1);
+    setEnrollmentResult(null);
+    setSubmissionError(null);
+  };
+
   return {
     methods,
     currentStep,
+    isEditingCourse,
     handleNextStep,
     handlePrevStep,
     goToStep,
+    startCourseEdit,
     handleEnrollmentTypeChange,
     pendingSwitch,
     confirmSwitch,
     cancelSwitch,
     handleSubmit,
+    handleReset,
     isPending: mutation.isPending,
     submissionError,
     enrollmentResult,
