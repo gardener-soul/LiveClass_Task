@@ -109,11 +109,11 @@ export function Step2PersonalInfo({ onNext, onPrev }: Step2PersonalInfoProps) {
       {enrollmentType === 'group' && <Step2GroupInfo />}
 
       {/* 네비게이션 */}
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onPrev}>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
+        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onPrev}>
           ← 이전
         </Button>
-        <Button type="button" onClick={onNext}>
+        <Button type="button" className="w-full sm:w-auto" onClick={onNext}>
           다음 단계 →
         </Button>
       </div>
