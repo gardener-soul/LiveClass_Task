@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm, type FieldPath } from 'react-hook-form';
+import { useFormPersistence } from '@/hooks/useFormPersistence';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
@@ -68,6 +69,8 @@ export function useEnrollmentForm() {
     },
   });
 
+  const { clearPersisted, wasRestored } = useFormPersistence(methods, currentStep, setCurrentStep);
+
   const handleNextStep = () => {
     const values = methods.getValues();
 
@@ -84,10 +87,17 @@ export function useEnrollmentForm() {
     const result = stepSchema.safeParse(values);
 
     if (!result.success) {
+      let firstErrorPath: FieldPath<EnrollmentFormValues> | null = null;
+
       result.error.issues.forEach((issue) => {
         const path = issue.path.join('.') as FieldPath<EnrollmentFormValues>;
-        if (path) methods.setError(path, { type: 'manual', message: issue.message });
+        if (path) {
+          if (!firstErrorPath) firstErrorPath = path;
+          methods.setError(path, { type: 'manual', message: issue.message });
+        }
       });
+
+      if (firstErrorPath) methods.setFocus(firstErrorPath);
       return;
     }
 
@@ -162,6 +172,7 @@ export function useEnrollmentForm() {
     setCurrentStep(1);
     setEnrollmentResult(null);
     setSubmissionError(null);
+    clearPersisted();
   };
 
   return {
@@ -181,5 +192,6 @@ export function useEnrollmentForm() {
     isPending: mutation.isPending,
     submissionError,
     enrollmentResult,
+    wasRestored,
   };
 }
