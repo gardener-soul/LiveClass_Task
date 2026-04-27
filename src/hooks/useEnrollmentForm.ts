@@ -99,5 +99,6 @@ export function useEnrollmentForm() {
     isPending,
     submissionError,
     enrollmentResult,
+    wasRestored,
   };
 }

@@ -56,6 +56,8 @@ interface CourseCardProps {
 
 function CourseCard({ course, isSelected, onSelect }: CourseCardProps) {
   const isFull = course.currentEnrollment >= course.maxCapacity;
+  const remaining = course.maxCapacity - course.currentEnrollment;
+  const isAlmostFull = !isFull && remaining <= 5;
 
   return (
     <div
@@ -96,8 +98,9 @@ function CourseCard({ course, isSelected, onSelect }: CourseCardProps) {
         </p>
         <div className="flex items-center justify-between mt-1">
           <p className="text-sm font-semibold text-primary">{course.price.toLocaleString()}원</p>
-          {isFull && (
-            <Badge variant="destructive" className="text-xs">정원 마감</Badge>
+          {isFull && <Badge variant="destructive">정원 마감</Badge>}
+          {isAlmostFull && (
+            <Badge variant="warning">마감 임박 ({remaining}자리 남음)</Badge>
           )}
         </div>
       </div>
@@ -126,7 +129,7 @@ export function Step1CourseSelect({ onEnrollmentTypeChange, onNext, isEditingCou
 
       {/* 카테고리 탭 + 신청 유형 */}
       <div className="flex flex-col gap-3">
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
           {TABS.map((tab) => (
             <Button
               key={tab}

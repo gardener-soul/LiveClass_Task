@@ -26,8 +26,8 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex gap-2 text-sm">
-      <span className="text-muted-foreground w-20 shrink-0">{label}</span>
+    <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm">
+      <span className="text-muted-foreground shrink-0">{label}</span>
       <span className="font-medium">{value}</span>
     </div>
   );
@@ -67,6 +67,10 @@ export function Step3Confirm({
   const { data } = useCourses();
 
   const selectedCourse = data?.courses.find((c) => c.id === values.courseId);
+  const remaining = selectedCourse
+    ? selectedCourse.maxCapacity - selectedCourse.currentEnrollment
+    : 0;
+  const isAlmostFull = remaining > 0 && remaining <= 5;
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,6 +110,11 @@ export function Step3Confirm({
               value={`${selectedCourse.startDate} ~ ${selectedCourse.endDate}`}
             />
             <InfoRow label="수강료" value={`${selectedCourse.price.toLocaleString()}원`} />
+            {isAlmostFull && (
+              <p className="text-xs text-amber-600 font-medium">
+                ⚠ 잔여 자리가 {remaining}자리 남아있습니다. 빠른 신청을 권장합니다.
+              </p>
+            )}
           </>
         ) : (
           <p className="text-sm text-muted-foreground">선택된 강의가 없습니다.</p>
@@ -118,8 +127,8 @@ export function Step3Confirm({
         <InfoRow label="이메일" value={values.applicant.email} />
         <InfoRow label="전화번호" value={values.applicant.phone} />
         {values.applicant.motivation && (
-          <div className="flex gap-2 text-sm">
-            <span className="text-muted-foreground w-20 shrink-0">수강 동기</span>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm">
+            <span className="text-muted-foreground shrink-0">수강 동기</span>
             <span className="font-medium break-words">{values.applicant.motivation}</span>
           </div>
         )}
@@ -166,11 +175,11 @@ export function Step3Confirm({
       />
 
       {/* 네비게이션 */}
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onPrev} disabled={isPending}>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
+        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onPrev} disabled={isPending}>
           ← 이전
         </Button>
-        <Button type="button" onClick={onSubmit} disabled={isPending || !agreedToTerms}>
+        <Button type="button" className="w-full sm:w-auto" onClick={onSubmit} disabled={isPending || !agreedToTerms}>
           {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
           신청하기
         </Button>

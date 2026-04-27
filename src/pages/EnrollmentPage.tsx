@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { FormProvider } from 'react-hook-form';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useEnrollmentForm } from '@/hooks/useEnrollmentForm';
 import { StepIndicator } from '@/components/common/StepIndicator';
 import { Step1CourseSelect } from '@/components/enrollment/Step1CourseSelect';
@@ -63,18 +66,52 @@ export function EnrollmentPage() {
     isPending,
     submissionError,
     enrollmentResult,
+    wasRestored,
   } = useEnrollmentForm();
+
+  const [stepDirection, setStepDirection] = useState<'forward' | 'backward'>('forward');
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  const onNext = () => {
+    setStepDirection('forward');
+    handleNextStep();
+  };
+
+  const onPrev = () => {
+    setStepDirection('backward');
+    handlePrevStep();
+  };
 
   return (
     <FormProvider {...methods}>
       <div className="min-h-screen bg-gray-50">
         <StepIndicator currentStep={currentStep} onStepClick={goToStep} />
 
-        <main className="mx-auto max-w-2xl px-4 py-8">
+        {wasRestored && !bannerDismissed && (
+          <div className="mx-auto flex max-w-2xl items-center justify-between rounded-lg bg-primary/10 px-4 py-2.5 text-sm text-primary">
+            <span>이전에 작성하던 내용을 불러왔습니다.</span>
+            <button
+              type="button"
+              onClick={() => setBannerDismissed(true)}
+              className="ml-3 shrink-0 hover:opacity-70"
+              aria-label="닫기"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        )}
+
+        <main
+          key={currentStep}
+          className={cn(
+            'mx-auto max-w-2xl px-4 py-8',
+            stepDirection === 'forward' ? 'animate-slide-in-right' : 'animate-slide-in-left',
+          )}
+        >
           {currentStep === 1 && (
             <Step1CourseSelect
               onEnrollmentTypeChange={handleEnrollmentTypeChange}
-              onNext={handleNextStep}
+              onNext={onNext}
               isEditingCourse={isEditingCourse}
             />
           )}
@@ -83,7 +120,7 @@ export function EnrollmentPage() {
           )}
           {currentStep === 3 && (
             <Step3Confirm
-              onPrev={handlePrevStep}
+              onPrev={onPrev}
               onSubmit={handleSubmit}
               goToStep={goToStep}
               onEditCourse={startCourseEdit}
