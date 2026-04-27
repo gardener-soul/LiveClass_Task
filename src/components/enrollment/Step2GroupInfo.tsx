@@ -105,33 +105,35 @@ export function Step2GroupInfo() {
               <span className="mt-2 text-xs text-muted-foreground w-5 shrink-0">
                 {index + 1}
               </span>
-              <div className="flex-1 flex flex-col gap-1.5">
-                <FormField
-                  control={control}
-                  name={`group.participants.${index}.name`}
-                  render={({ field: f }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="이름" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="flex-1 flex flex-col gap-1.5">
-                <FormField
-                  control={control}
-                  name={`group.participants.${index}.email`}
-                  render={({ field: f }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="이메일" type="email" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="flex-1 flex flex-col sm:flex-row gap-2">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <FormField
+                    control={control}
+                    name={`group.participants.${index}.name`}
+                    render={({ field: f }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="이름" {...f} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <FormField
+                    control={control}
+                    name={`group.participants.${index}.email`}
+                    render={({ field: f }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="이메일" type="email" {...f} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </div>
           ))}

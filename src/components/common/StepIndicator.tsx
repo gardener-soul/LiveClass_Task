@@ -33,7 +33,7 @@ export function StepIndicator({ currentStep, onStepClick }: StepIndicatorProps) 
           </button>
           <span
             className={cn(
-              'text-sm',
+              'hidden sm:block text-sm',
               step === currentStep ? 'font-medium text-foreground' : 'text-muted-foreground',
             )}
           >
