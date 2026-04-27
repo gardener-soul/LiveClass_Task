@@ -82,7 +82,7 @@ describe('Step3Confirm', () => {
       isError: false,
       data: { courses: [MOCK_COURSE], categories: ['development'] },
       refetch: vi.fn(),
-    } as ReturnType<typeof useCourses>)
+    } as unknown as ReturnType<typeof useCourses>)
   })
 
   it('강의 정보 요약(강의명, 강사, 수강 기간, 수강료)을 표시한다', () => {
