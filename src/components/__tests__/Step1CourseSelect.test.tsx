@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { screen } from '@testing-library/react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { renderWithProviders } from '@/test-utils'
 import { Step1CourseSelect } from '@/components/enrollment/Step1CourseSelect'
@@ -96,11 +95,11 @@ describe('Step1CourseSelect', () => {
       isError: false,
       data: { courses: MOCK_COURSES, categories: ['development'] },
       refetch: vi.fn(),
-    } as ReturnType<typeof useCourses>)
+    } as unknown as ReturnType<typeof useCourses>)
   })
 
   it('로딩 상태일 때 스켈레톤 6개를 렌더링한다', () => {
-    mockUseCourses.mockReturnValue({ isLoading: true, isError: false, data: undefined, refetch: vi.fn() } as ReturnType<typeof useCourses>)
+    mockUseCourses.mockReturnValue({ isLoading: true, isError: false, data: undefined, refetch: vi.fn() } as unknown as ReturnType<typeof useCourses>)
 
     renderWithProviders(<Wrapper />)
 
@@ -109,7 +108,7 @@ describe('Step1CourseSelect', () => {
   })
 
   it('에러 상태일 때 에러 메시지와 "다시 시도" 버튼을 렌더링한다', () => {
-    mockUseCourses.mockReturnValue({ isLoading: false, isError: true, data: undefined, refetch: vi.fn() } as ReturnType<typeof useCourses>)
+    mockUseCourses.mockReturnValue({ isLoading: false, isError: true, data: undefined, refetch: vi.fn() } as unknown as ReturnType<typeof useCourses>)
 
     renderWithProviders(<Wrapper />)
 
@@ -123,7 +122,7 @@ describe('Step1CourseSelect', () => {
       isError: false,
       data: { courses: [], categories: [] },
       refetch: vi.fn(),
-    } as ReturnType<typeof useCourses>)
+    } as unknown as ReturnType<typeof useCourses>)
 
     renderWithProviders(<Wrapper />)
 

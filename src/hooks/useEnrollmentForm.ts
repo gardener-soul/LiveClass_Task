@@ -53,6 +53,7 @@ export function useEnrollmentForm() {
   const stepNav = useStepNavigation(methods, initialDraft?.step ?? 1);
 
   const { clearDraft } = useEnrollmentDraft(methods, stepNav.currentStep, enrollmentResult);
+  const wasRestored = initialDraft !== null;
 
   const hasGroupData = () => {
     const group = methods.getValues('group');
