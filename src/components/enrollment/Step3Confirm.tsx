@@ -138,18 +138,19 @@ export function Step3Confirm({
       {values.enrollmentType === 'group' && values.group && (
         <SummaryCard title="단체 정보" onEdit={() => goToStep(2)}>
           <InfoRow label="단체명" value={values.group.organizationName} />
-          <InfoRow label="신청 인원" value={`${values.group.headCount}명`} />
+          <InfoRow label="신청 인원" value={`${values.group.headCount ?? '-'}명`} />
           <InfoRow label="담당자" value={values.group.contactPerson} />
           {values.group.participants.length > 0 && (
-            <InfoRow
-              label="참가자"
-              value={
-                `${values.group.participants[0].name}(${values.group.participants[0].email})` +
-                (values.group.participants.length > 1
-                  ? ` 외 ${values.group.participants.length - 1}명`
-                  : '')
-              }
-            />
+            <div className="flex gap-2 text-sm">
+              <span className="text-muted-foreground w-20 shrink-0">참가자</span>
+              <div className="flex flex-col gap-1">
+                {values.group.participants.map((p, i) => (
+                  <span key={i} className="font-medium">
+                    {p.name} ({p.email})
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
         </SummaryCard>
       )}

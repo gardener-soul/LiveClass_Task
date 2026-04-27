@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 
 import type { EnrollmentFormValues } from '@/hooks/useEnrollmentForm';
+import { useCourses } from '@/hooks/useCourses';
 import { formatPhoneInput } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import {
@@ -20,6 +21,14 @@ export function Step2GroupInfo() {
   });
 
   const headCount = watch('group.headCount') ?? 0;
+  const courseId = watch('courseId');
+
+  const { data } = useCourses();
+  const selectedCourse = data?.courses.find((c) => c.id === courseId);
+  const remainingCapacity = selectedCourse
+    ? selectedCourse.maxCapacity - selectedCourse.currentEnrollment
+    : 10;
+  const effectiveMax = Math.min(10, remainingCapacity);
 
   useEffect(() => {
     const diff = headCount - fields.length;
@@ -59,16 +68,37 @@ export function Step2GroupInfo() {
         name="group.headCount"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>신청 인원수 * (2~10명)</FormLabel>
+            <FormLabel>신청 인원수 * (2~{effectiveMax}명)</FormLabel>
+            {remainingCapacity < 10 && (
+              <p className="text-xs text-amber-600">
+                잔여 정원이 {remainingCapacity}명입니다. 최대 {effectiveMax}명까지 단체 신청이 가능합니다.
+              </p>
+            )}
             <FormControl>
               <Input
                 type="number"
                 min={2}
-                max={10}
+                max={effectiveMax}
                 placeholder="5"
                 {...field}
                 value={field.value ?? ''}
-                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                onChange={(e) => {
+                  const val = e.target.valueAsNumber;
+                  if (isNaN(val)) {
+                    field.onChange(undefined);
+                  } else if (val > effectiveMax) {
+                    field.onChange(effectiveMax);
+                  } else {
+                    field.onChange(val);
+                  }
+                }}
+                onBlur={(e) => {
+                  const val = e.target.valueAsNumber;
+                  if (!isNaN(val) && val < 2) {
+                    field.onChange(2);
+                  }
+                  field.onBlur();
+                }}
               />
             </FormControl>
             <FormMessage />
