@@ -35,8 +35,7 @@ export function useFormPersistence(
   const currentStepRef = useRef(currentStep);
   currentStepRef.current = currentStep;
 
-  // 마운트 시 1회만 실행
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // 마운트 시 1회만 실행 (methods, setCurrentStep은 stable ref)
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -61,7 +60,7 @@ export function useFormPersistence(
     } catch {
       localStorage.removeItem(STORAGE_KEY);
     }
-  }, []);
+  }, [methods, setCurrentStep]);
 
   useEffect(() => {
     const subscription = methods.watch((values) => {

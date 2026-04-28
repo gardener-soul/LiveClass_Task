@@ -60,7 +60,10 @@ export function useStepNavigation(
   const handlePrevStep = () => setCurrentStep((prev) => (prev - 1) as 1 | 2 | 3);
 
   const requestBack = () => setPendingBack(true);
-  const confirmBack = () => { setPendingBack(false); setCurrentStep(1); };
+  const confirmBack = () => {
+    setPendingBack(false);
+    setCurrentStep(1);
+  };
   const cancelBack = () => setPendingBack(false);
 
   const goToStep = (step: 1 | 2 | 3) => {
@@ -68,7 +71,10 @@ export function useStepNavigation(
   };
 
   // Step 3에서 강의 정보만 수정할 때: Step 2를 건너뛰고 Step 1 → Step 3으로 이동
-  const startCourseEdit = () => { setIsEditingCourse(true); setCurrentStep(1); };
+  const startCourseEdit = () => {
+    setIsEditingCourse(true);
+    setCurrentStep(1);
+  };
 
   return {
     currentStep,
