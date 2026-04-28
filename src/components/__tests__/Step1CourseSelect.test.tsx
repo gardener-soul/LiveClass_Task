@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { useForm, FormProvider } from 'react-hook-form'
 import { renderWithProviders } from '@/test-utils'
 import { Step1CourseSelect } from '@/components/enrollment/Step1CourseSelect'
@@ -66,7 +67,7 @@ function WrapperWithError() {
   }, [])
   return (
     <FormProvider {...methods}>
-      <Step1CourseSelect onNext={vi.fn()} onEnrollmentTypeChange={vi.fn()} />
+      <Step1CourseSelect onNext={vi.fn()} onEnrollmentTypeChange={vi.fn()} onForcePersonal={vi.fn()} />
     </FormProvider>
   )
 }
@@ -82,7 +83,7 @@ function Wrapper({ onNext = vi.fn(), onEnrollmentTypeChange = vi.fn() } = {}) {
   })
   return (
     <FormProvider {...methods}>
-      <Step1CourseSelect onNext={onNext} onEnrollmentTypeChange={onEnrollmentTypeChange} />
+      <Step1CourseSelect onNext={onNext} onEnrollmentTypeChange={onEnrollmentTypeChange} onForcePersonal={vi.fn()} />
     </FormProvider>
   )
 }
@@ -154,5 +155,133 @@ describe('Step1CourseSelect', () => {
     renderWithProviders(<WrapperWithError />)
 
     expect(screen.getByText('강의를 선택해주세요')).toBeInTheDocument()
+  })
+
+  it('단체 신청 활성 상태에서 잔여 1석 강의 선택 시 onForcePersonal을 호출한다', async () => {
+    const user = userEvent.setup()
+    const onForcePersonal = vi.fn()
+    const onEnrollmentTypeChange = vi.fn()
+
+    function GroupActiveWrapper() {
+      const methods = useForm<EnrollmentFormValues>({
+        defaultValues: {
+          courseId: '',
+          enrollmentType: 'group', // 단체 신청 활성
+          applicant: { name: '', email: '', phone: '', motivation: '' },
+          agreedToTerms: false,
+        },
+      })
+      return (
+        <FormProvider {...methods}>
+          <Step1CourseSelect
+            onNext={vi.fn()}
+            onEnrollmentTypeChange={onEnrollmentTypeChange}
+            onForcePersonal={onForcePersonal}
+          />
+        </FormProvider>
+      )
+    }
+
+    renderWithProviders(<GroupActiveWrapper />)
+
+    await user.click(screen.getByText('TypeScript 심화')) // 잔여 1석 강의
+    expect(onForcePersonal).toHaveBeenCalledTimes(1)
+  })
+
+  it('단체 신청 활성 상태에서 잔여 1석 강의 선택 시 단체 신청 불가 다이얼로그를 표시한다', async () => {
+    const user = userEvent.setup()
+
+    function GroupActiveWrapper() {
+      const methods = useForm<EnrollmentFormValues>({
+        defaultValues: {
+          courseId: '',
+          enrollmentType: 'group',
+          applicant: { name: '', email: '', phone: '', motivation: '' },
+          agreedToTerms: false,
+        },
+      })
+      return (
+        <FormProvider {...methods}>
+          <Step1CourseSelect
+            onNext={vi.fn()}
+            onEnrollmentTypeChange={vi.fn()}
+            onForcePersonal={vi.fn()}
+          />
+        </FormProvider>
+      )
+    }
+
+    renderWithProviders(<GroupActiveWrapper />)
+
+    await user.click(screen.getByText('TypeScript 심화'))
+
+    await waitFor(() => {
+      expect(screen.getByText('단체 신청 불가')).toBeInTheDocument()
+    })
+  })
+
+  it('잔여 1석 강의 선택 상태에서 단체 신청 클릭 시 다이얼로그를 표시하고 전환하지 않는다', async () => {
+    const user = userEvent.setup()
+    const onEnrollmentTypeChange = vi.fn()
+
+    function PersonalWithAlmostFullWrapper() {
+      const methods = useForm<EnrollmentFormValues>({
+        defaultValues: {
+          courseId: 'course-dev-02', // 잔여 1석 강의 미리 선택
+          enrollmentType: 'personal',
+          applicant: { name: '', email: '', phone: '', motivation: '' },
+          agreedToTerms: false,
+        },
+      })
+      return (
+        <FormProvider {...methods}>
+          <Step1CourseSelect
+            onNext={vi.fn()}
+            onEnrollmentTypeChange={onEnrollmentTypeChange}
+            onForcePersonal={vi.fn()}
+          />
+        </FormProvider>
+      )
+    }
+
+    renderWithProviders(<PersonalWithAlmostFullWrapper />)
+
+    await user.click(screen.getByRole('radio', { name: '단체 신청' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('단체 신청 불가')).toBeInTheDocument()
+    })
+    expect(onEnrollmentTypeChange).not.toHaveBeenCalled()
+  })
+
+  it('잔여 좌석이 충분한 강의 선택 상태에서 단체 신청 전환은 정상 호출된다', async () => {
+    const user = userEvent.setup()
+    const onEnrollmentTypeChange = vi.fn()
+
+    function PersonalWithAvailableWrapper() {
+      const methods = useForm<EnrollmentFormValues>({
+        defaultValues: {
+          courseId: 'course-dev-01', // 잔여 7석 (25-18)
+          enrollmentType: 'personal',
+          applicant: { name: '', email: '', phone: '', motivation: '' },
+          agreedToTerms: false,
+        },
+      })
+      return (
+        <FormProvider {...methods}>
+          <Step1CourseSelect
+            onNext={vi.fn()}
+            onEnrollmentTypeChange={onEnrollmentTypeChange}
+            onForcePersonal={vi.fn()}
+          />
+        </FormProvider>
+      )
+    }
+
+    renderWithProviders(<PersonalWithAvailableWrapper />)
+
+    await user.click(screen.getByRole('radio', { name: '단체 신청' }))
+
+    expect(onEnrollmentTypeChange).toHaveBeenCalledWith('group')
   })
 })

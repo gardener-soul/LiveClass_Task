@@ -27,7 +27,14 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-function ConfirmDialog({ open, title, description, confirmLabel, onConfirm, onCancel }: ConfirmDialogProps) {
+function ConfirmDialog({
+  open,
+  title,
+  description,
+  confirmLabel,
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={() => onCancel()}>
       <DialogContent showCloseButton={false}>
@@ -36,8 +43,12 @@ function ConfirmDialog({ open, title, description, confirmLabel, onConfirm, onCa
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel}>취소</Button>
-          <Button variant="destructive" onClick={onConfirm}>{confirmLabel}</Button>
+          <Button variant="outline" onClick={onCancel}>
+            취소
+          </Button>
+          <Button variant="destructive" onClick={onConfirm}>
+            {confirmLabel}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -54,6 +65,7 @@ export function EnrollmentPage() {
     goToStep,
     startCourseEdit,
     handleEnrollmentTypeChange,
+    forcePersonal,
     pendingSwitch,
     confirmSwitch,
     cancelSwitch,
@@ -111,13 +123,12 @@ export function EnrollmentPage() {
           {currentStep === 1 && (
             <Step1CourseSelect
               onEnrollmentTypeChange={handleEnrollmentTypeChange}
+              onForcePersonal={forcePersonal}
               onNext={onNext}
               isEditingCourse={isEditingCourse}
             />
           )}
-          {currentStep === 2 && (
-            <Step2PersonalInfo onNext={handleNextStep} onPrev={requestBack} />
-          )}
+          {currentStep === 2 && <Step2PersonalInfo onNext={handleNextStep} onPrev={requestBack} />}
           {currentStep === 3 && (
             <Step3Confirm
               onPrev={onPrev}
@@ -148,9 +159,7 @@ export function EnrollmentPage() {
         />
       </div>
 
-      {enrollmentResult && (
-        <SuccessScreen result={enrollmentResult} onReset={handleReset} />
-      )}
+      {enrollmentResult && <SuccessScreen result={enrollmentResult} onReset={handleReset} />}
     </FormProvider>
   );
 }

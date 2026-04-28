@@ -97,6 +97,10 @@ describe('EnrollmentPage 통합 테스트', () => {
     })
 
     await user.click(screen.getByRole('button', { name: /이전/ }))
+    await waitFor(() => {
+      expect(screen.getByText('이전 단계로 이동하시겠습니까?')).toBeInTheDocument()
+    })
+    await user.click(screen.getByRole('button', { name: '이동' }))
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: '강의 선택' })).toBeInTheDocument()
@@ -166,6 +170,13 @@ describe('EnrollmentPage 통합 테스트', () => {
 
     // 이전으로 돌아가서 개인으로 전환
     await user.click(screen.getByRole('button', { name: /이전/ }))
+    await waitFor(() => {
+      expect(screen.getByText('이전 단계로 이동하시겠습니까?')).toBeInTheDocument()
+    })
+    await user.click(screen.getByRole('button', { name: '이동' }))
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: '강의 선택' })).toBeInTheDocument()
+    })
     await user.click(screen.getByRole('radio', { name: '개인 신청' }))
 
     // 다이얼로그 표시 확인
@@ -181,9 +192,14 @@ describe('EnrollmentPage 통합 테스트', () => {
 
   it('localStorage 복구 시 배너가 표시된다', async () => {
     const draft = {
-      formValues: { courseId: 'course-dev-01', enrollmentType: 'personal' },
-      currentStep: 2,
-      savedAt: new Date().toISOString(),
+      version: 1,
+      values: {
+        courseId: 'course-dev-01',
+        enrollmentType: 'personal',
+        applicant: { name: '김철수', email: 'test@example.com', phone: '010-1234-5678' },
+        agreedToTerms: false,
+      },
+      currentStep: 1,
     }
     localStorage.setItem('enrollment-form-draft', JSON.stringify(draft))
 

@@ -1,13 +1,15 @@
 import { z } from 'zod';
 
 const PHONE_REGEX = /^0[0-9]{1,2}-[0-9]{3,4}-[0-9]{4}$/;
+const NAME_REGEX = /^[가-힣a-zA-Z\s]+$/;
 
 export const applicantSchema = z.object({
   name: z
     .string()
     .min(1, { error: '이름을 입력해주세요' })
     .min(2, { error: '이름은 2자 이상이어야 합니다' })
-    .max(20, { error: '이름은 20자 이하이어야 합니다' }),
+    .max(20, { error: '이름은 20자 이하이어야 합니다' })
+    .regex(NAME_REGEX, { error: '이름은 한글 또는 영문만 입력 가능합니다' }),
   email: z
     .string()
     .min(1, { error: '이메일을 입력해주세요' })
@@ -20,7 +22,10 @@ export const applicantSchema = z.object({
 });
 
 const participantSchema = z.object({
-  name: z.string().min(1, { error: '참가자 이름을 입력해주세요' }),
+  name: z
+    .string()
+    .min(1, { error: '참가자 이름을 입력해주세요' })
+    .regex(NAME_REGEX, { error: '이름은 한글 또는 영문만 입력 가능합니다' }),
   email: z
     .string()
     .min(1, { error: '이메일을 입력해주세요' })

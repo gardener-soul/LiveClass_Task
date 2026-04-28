@@ -1,5 +1,13 @@
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { CheckIcon } from 'lucide-react';
 
 import type { Course, CourseCategory, EnrollmentType } from '@/types/enrollment';
@@ -13,9 +21,12 @@ import { Label } from '@/components/ui/label';
 
 interface Step1CourseSelectProps {
   onEnrollmentTypeChange: (type: EnrollmentType) => void;
+  onForcePersonal: () => void;
   onNext: () => void;
   isEditingCourse?: boolean;
 }
+
+const MIN_SEATS_FOR_GROUP = 2;
 
 const CATEGORY_LABELS: Record<string, string> = {
   all: '전체',
@@ -99,18 +110,22 @@ function CourseCard({ course, isSelected, onSelect }: CourseCardProps) {
         <div className="flex items-center justify-between mt-1">
           <p className="text-sm font-semibold text-primary">{course.price.toLocaleString()}원</p>
           {isFull && <Badge variant="destructive">정원 마감</Badge>}
-          {isAlmostFull && (
-            <Badge variant="warning">마감 임박 ({remaining}자리 남음)</Badge>
-          )}
+          {isAlmostFull && <Badge variant="warning">마감 임박 ({remaining}자리 남음)</Badge>}
         </div>
       </div>
     </div>
   );
 }
 
-export function Step1CourseSelect({ onEnrollmentTypeChange, onNext, isEditingCourse = false }: Step1CourseSelectProps) {
+export function Step1CourseSelect({
+  onEnrollmentTypeChange,
+  onForcePersonal,
+  onNext,
+  isEditingCourse = false,
+}: Step1CourseSelectProps) {
   const { watch, setValue, formState } = useFormContext<EnrollmentFormValues>();
   const [activeTab, setActiveTab] = useState<string>('all');
+  const [groupBlockReason, setGroupBlockReason] = useState<'none' | 'switch' | 'select'>('none');
 
   const selectedCourseId = watch('courseId');
   const enrollmentType = watch('enrollmentType');
@@ -119,6 +134,29 @@ export function Step1CourseSelect({ onEnrollmentTypeChange, onNext, isEditingCou
 
   const courses = data?.courses ?? [];
   const filtered = activeTab === 'all' ? courses : courses.filter((c) => c.category === activeTab);
+
+  const handleCourseSelect = (course: Course) => {
+    setValue('courseId', course.id, { shouldValidate: true });
+    const remaining = course.maxCapacity - course.currentEnrollment;
+    if (enrollmentType === 'group' && remaining < MIN_SEATS_FOR_GROUP) {
+      onForcePersonal();
+      setGroupBlockReason('select');
+    }
+  };
+
+  const handleEnrollmentTypeChange = (val: string) => {
+    if (val === 'group') {
+      const selectedCourse = courses.find((c) => c.id === selectedCourseId);
+      if (selectedCourse) {
+        const remaining = selectedCourse.maxCapacity - selectedCourse.currentEnrollment;
+        if (remaining < MIN_SEATS_FOR_GROUP) {
+          setGroupBlockReason('switch');
+          return;
+        }
+      }
+    }
+    onEnrollmentTypeChange(val as EnrollmentType);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -148,7 +186,7 @@ export function Step1CourseSelect({ onEnrollmentTypeChange, onNext, isEditingCou
           <p className="text-sm font-medium whitespace-nowrap">신청 유형</p>
           <RadioGroup
             value={enrollmentType}
-            onValueChange={(val: string) => onEnrollmentTypeChange(val as EnrollmentType)}
+            onValueChange={handleEnrollmentTypeChange}
             className="flex gap-6"
           >
             <div className="flex items-center gap-2">
@@ -198,7 +236,7 @@ export function Step1CourseSelect({ onEnrollmentTypeChange, onNext, isEditingCou
               key={course.id}
               course={course}
               isSelected={selectedCourseId === course.id}
-              onSelect={() => setValue('courseId', course.id, { shouldValidate: true })}
+              onSelect={() => handleCourseSelect(course)}
             />
           ))}
         </div>
@@ -214,6 +252,21 @@ export function Step1CourseSelect({ onEnrollmentTypeChange, onNext, isEditingCou
           {isEditingCourse ? '최종 확인으로 →' : '다음 단계 →'}
         </Button>
       </div>
+
+      <Dialog open={groupBlockReason !== 'none'} onOpenChange={() => setGroupBlockReason('none')}>
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>단체 신청 불가</DialogTitle>
+            <DialogDescription>
+              선택한 강의의 잔여 좌석이 1자리뿐이어서 단체 신청이 불가합니다.
+              {groupBlockReason === 'select' && ' 개인 신청으로 전환되었습니다.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setGroupBlockReason('none')}>확인</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

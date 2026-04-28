@@ -176,10 +176,21 @@ export function Step3Confirm({
 
       {/* 네비게이션 */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
-        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onPrev} disabled={isPending}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={onPrev}
+          disabled={isPending}
+        >
           ← 이전
         </Button>
-        <Button type="button" className="w-full sm:w-auto" onClick={onSubmit} disabled={isPending || !agreedToTerms}>
+        <Button
+          type="button"
+          className="w-full sm:w-auto"
+          onClick={onSubmit}
+          disabled={isPending || !agreedToTerms}
+        >
           {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
           신청하기
         </Button>
