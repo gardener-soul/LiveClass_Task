@@ -33,9 +33,7 @@ export function SuccessScreen({ result, onReset }: SuccessScreenProps) {
       <div className="w-full max-w-sm rounded-xl border border-border bg-card p-5 flex flex-col gap-2 mb-8 animate-fade-up-delay-350">
         <div className="flex gap-2 text-sm">
           <span className="text-muted-foreground w-20 shrink-0">신청 상태</span>
-          <span className="font-medium">
-            {result.status === 'confirmed' ? '확정' : '대기 중'}
-          </span>
+          <span className="font-medium">{result.status === 'confirmed' ? '확정' : '대기 중'}</span>
         </div>
         <div className="flex gap-2 text-sm">
           <span className="text-muted-foreground w-20 shrink-0">신청 일시</span>

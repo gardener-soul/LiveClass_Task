@@ -5,13 +5,7 @@ import { formatPhoneInput } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Step2GroupInfo } from '@/components/enrollment/Step2GroupInfo';
 
 interface Step2PersonalInfoProps {

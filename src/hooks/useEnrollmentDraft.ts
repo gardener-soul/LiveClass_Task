@@ -28,11 +28,14 @@ export function useEnrollmentDraft(
     const subscription = methods.watch((values) => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       debounceTimerRef.current = setTimeout(() => {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify({
-          version: 1,
-          values: values as EnrollmentFormValues,
-          currentStep: currentStepRef.current,
-        } satisfies EnrollmentDraft));
+        localStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({
+            version: 1,
+            values: values as EnrollmentFormValues,
+            currentStep: currentStepRef.current,
+          } satisfies EnrollmentDraft),
+        );
       }, 500);
     });
     return () => {
@@ -52,11 +55,14 @@ export function useEnrollmentDraft(
       clearTimeout(debounceTimerRef.current);
       debounceTimerRef.current = null;
     }
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({
-      version: 1,
-      values: methods.getValues(),
-      currentStep,
-    } satisfies EnrollmentDraft));
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({
+        version: 1,
+        values: methods.getValues(),
+        currentStep,
+      } satisfies EnrollmentDraft),
+    );
   }, [currentStep, enrollmentResult, methods]);
 
   // 브라우저 이탈 방지 (제출 성공 후 비활성화)

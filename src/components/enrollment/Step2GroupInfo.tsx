@@ -5,13 +5,7 @@ import type { EnrollmentFormValues } from '@/hooks/useEnrollmentForm';
 import { useCourses } from '@/hooks/useCourses';
 import { formatPhoneInput } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 
 export function Step2GroupInfo() {
   const { control, watch } = useFormContext<EnrollmentFormValues>();
@@ -37,9 +31,7 @@ export function Step2GroupInfo() {
         append({ name: '', email: '' }, { shouldFocus: false });
       }
     } else if (diff < 0) {
-      remove(
-        Array.from({ length: Math.abs(diff) }, (_, i) => fields.length - 1 - i),
-      );
+      remove(Array.from({ length: Math.abs(diff) }, (_, i) => fields.length - 1 - i));
     }
   }, [headCount, fields.length, append, remove]);
 
@@ -71,7 +63,8 @@ export function Step2GroupInfo() {
             <FormLabel>신청 인원수 * (2~{effectiveMax}명)</FormLabel>
             {remainingCapacity < 10 && (
               <p className="text-xs text-amber-600">
-                잔여 정원이 {remainingCapacity}명입니다. 최대 {effectiveMax}명까지 단체 신청이 가능합니다.
+                잔여 정원이 {remainingCapacity}명입니다. 최대 {effectiveMax}명까지 단체 신청이
+                가능합니다.
               </p>
             )}
             <FormControl>
@@ -132,9 +125,7 @@ export function Step2GroupInfo() {
           <p className="text-sm font-medium">참가자 명단</p>
           {fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-start">
-              <span className="mt-2 text-xs text-muted-foreground w-5 shrink-0">
-                {index + 1}
-              </span>
+              <span className="mt-2 text-xs text-muted-foreground w-5 shrink-0">{index + 1}</span>
               <div className="flex-1 flex flex-col sm:flex-row gap-2">
                 <div className="flex-1 flex flex-col gap-1.5">
                   <FormField

@@ -57,6 +57,9 @@ export function useEnrollmentSubmit(methods: UseFormReturn<EnrollmentFormValues>
     enrollmentResult,
     handleSubmit,
     isPending: mutation.isPending,
-    resetSubmit: () => { setEnrollmentResult(null); setSubmissionError(null); },
+    resetSubmit: () => {
+      setEnrollmentResult(null);
+      setSubmissionError(null);
+    },
   };
 }
