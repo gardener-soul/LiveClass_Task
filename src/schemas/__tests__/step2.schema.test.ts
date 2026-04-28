@@ -31,6 +31,24 @@ describe('step2PersonalSchema', () => {
     }
   })
 
+  it('이름에 숫자가 포함되면 실패한다', () => {
+    const result = step2PersonalSchema.safeParse({
+      applicant: { ...validApplicant, name: '김철수1' },
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      const issue = result.error.issues.find((i) => i.path.includes('name'))
+      expect(issue?.message).toMatch(/한글 또는 영문/)
+    }
+  })
+
+  it('이름이 영문이면 통과한다', () => {
+    const result = step2PersonalSchema.safeParse({
+      applicant: { ...validApplicant, name: 'John' },
+    })
+    expect(result.success).toBe(true)
+  })
+
   it('이름이 21자이면 실패한다', () => {
     const result = step2PersonalSchema.safeParse({
       applicant: { ...validApplicant, name: '김'.repeat(21) },
@@ -87,9 +105,9 @@ const validGroup = {
   organizationName: '테스트 회사',
   headCount: 3,
   participants: [
-    { name: '참가자1', email: 'p1@example.com' },
-    { name: '참가자2', email: 'p2@example.com' },
-    { name: '참가자3', email: 'p3@example.com' },
+    { name: '홍길동', email: 'p1@example.com' },
+    { name: '이영희', email: 'p2@example.com' },
+    { name: '박철수', email: 'p3@example.com' },
   ],
   contactPerson: '010-9876-5432',
 }
@@ -123,7 +141,7 @@ describe('step2GroupSchema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       const issue = result.error.issues.find((i) => i.path.includes('headCount'))
-      expect(issue?.message).toMatch(/최대 10명/)
+      expect(issue?.message).toMatch(/잔여 정원/)
     }
   })
 
@@ -133,9 +151,9 @@ describe('step2GroupSchema', () => {
       group: {
         ...validGroup,
         participants: [
-          { name: '참가자1', email: validApplicant.email },
-          { name: '참가자2', email: 'p2@example.com' },
-          { name: '참가자3', email: 'p3@example.com' },
+          { name: '홍길동', email: validApplicant.email },
+          { name: '이영희', email: 'p2@example.com' },
+          { name: '박철수', email: 'p3@example.com' },
         ],
       },
     })
@@ -152,9 +170,9 @@ describe('step2GroupSchema', () => {
       group: {
         ...validGroup,
         participants: [
-          { name: '참가자1', email: 'p1@example.com' },
-          { name: '참가자2', email: 'p1@example.com' },
-          { name: '참가자3', email: 'p3@example.com' },
+          { name: '홍길동', email: 'p1@example.com' },
+          { name: '이영희', email: 'p1@example.com' },
+          { name: '박철수', email: 'p3@example.com' },
         ],
       },
     })
@@ -171,9 +189,43 @@ describe('step2GroupSchema', () => {
       group: {
         ...validGroup,
         participants: [
-          { name: '참가자1', email: 'p1@example.com' },
-          { name: '참가자2', email: 'p2@example.com' },
-          { name: '참가자3', email: 'p3@example.com' },
+          { name: '홍길동', email: 'p1@example.com' },
+          { name: '이영희', email: 'p2@example.com' },
+          { name: '박철수', email: 'p3@example.com' },
+        ],
+      },
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('참가자 이름에 숫자가 포함되면 실패한다', () => {
+    const result = step2GroupSchema.safeParse({
+      applicant: validApplicant,
+      group: {
+        ...validGroup,
+        participants: [
+          { name: '홍길동1', email: 'p1@example.com' },
+          { name: '이영희', email: 'p2@example.com' },
+          { name: '박철수', email: 'p3@example.com' },
+        ],
+      },
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      const issue = result.error.issues.find((i) => i.path.includes('name'))
+      expect(issue?.message).toMatch(/한글 또는 영문/)
+    }
+  })
+
+  it('참가자 이름이 영문이면 통과한다', () => {
+    const result = step2GroupSchema.safeParse({
+      applicant: validApplicant,
+      group: {
+        ...validGroup,
+        participants: [
+          { name: 'John Doe', email: 'p1@example.com' },
+          { name: '이영희', email: 'p2@example.com' },
+          { name: '박철수', email: 'p3@example.com' },
         ],
       },
     })
